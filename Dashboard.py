@@ -7,7 +7,6 @@ import pandas as pd
 import dash_bootstrap_components as dbc
 from dash_bootstrap_templates import load_figure_template
 import plotly.offline as pyo
-import gunicorn
 
 
 
@@ -18,12 +17,6 @@ custeio_sem_extrativismo = pd.read_excel('https://github.com/jpeconomia/Dados-de
 investimento_lavoura_permanente = pd.read_excel('https://github.com/jpeconomia/Dados-de-Cr-dito-Rural/raw/main/Investimento%20lavoura%20permanente.xlsx')
 
 # geojson para os gráficos de mapa
-
-path = "C:\\Users\\joaop\\Documents\\Dados de Conjuntura\\Dados Crédito Rural\\estados_brasil.geojson"
-with open(path) as arquivo: 
-    mapa = json.load(arquivo)
-for feature in mapa['features']:
-    feature['id'] = feature['properties']['sigla']
 
 # Espécies selecionadas: 
 
