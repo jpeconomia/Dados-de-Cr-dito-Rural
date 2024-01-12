@@ -17,7 +17,7 @@ custeio_sem_extrativismo = pd.read_excel('https://github.com/jpeconomia/Dados-de
 
 investimento_lavoura_permanente = pd.read_excel('https://github.com/jpeconomia/Dados-de-Cr-dito-Rural/raw/main/Investimento%20lavoura%20permanente.xlsx')
 
-custeio_com_extrativismo = p.read_excel('https://github.com/jpeconomia/Dados-de-Cr-dito-Rural/raw/main/Custeio%20com%20extrativismo.xlsx')
+custeio_com_extrativismo = pd.read_excel('https://github.com/jpeconomia/Dados-de-Cr-dito-Rural/raw/main/Custeio%20com%20extrativismo.xlsx')
 
 # Espécies selecionadas: 
 
