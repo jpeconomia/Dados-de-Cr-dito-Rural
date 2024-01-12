@@ -58,6 +58,8 @@ dbc_css = "https://cdn.jsdelivr.net/gh/AnnMarieW/dash-bootstrap-templates/dbc.mi
 app = Dash(__name__, external_stylesheets=[dbc.themes.JOURNAL, dbc_css])
 load_figure_template('JOURNAL')
 
+server = app.server
+
 # assume you have a "long-form" data frame
 # see https://plotly.com/python/px-arguments/ for more options
 
