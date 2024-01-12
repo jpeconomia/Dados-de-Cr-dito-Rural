@@ -1,4 +1,6 @@
-### Importando os pacotes: 
+# tentativa 
+
+#### Importando os pacotes: 
 
 
 from dash import Dash, html, dcc, callback, Input, Output
@@ -6,7 +8,6 @@ import plotly.express as px
 import pandas as pd
 import dash_bootstrap_components as dbc
 from dash_bootstrap_templates import load_figure_template
-import plotly.offline as pyo
 
 
 
@@ -16,7 +17,7 @@ custeio_sem_extrativismo = pd.read_excel('https://github.com/jpeconomia/Dados-de
 
 investimento_lavoura_permanente = pd.read_excel('https://github.com/jpeconomia/Dados-de-Cr-dito-Rural/raw/main/Investimento%20lavoura%20permanente.xlsx')
 
-# geojson para os gráficos de mapa
+custeio_com_extrativismo = p.read_excel('https://github.com/jpeconomia/Dados-de-Cr-dito-Rural/raw/main/Custeio%20com%20extrativismo.xlsx')
 
 # Espécies selecionadas: 
 
@@ -56,7 +57,6 @@ m1 = {'display': 'inline-block','width':'50%'}
 dbc_css = "https://cdn.jsdelivr.net/gh/AnnMarieW/dash-bootstrap-templates/dbc.min.css"
 app = Dash(__name__, external_stylesheets=[dbc.themes.JOURNAL, dbc_css])
 load_figure_template('JOURNAL')
-server = app.server
 
 # assume you have a "long-form" data frame
 # see https://plotly.com/python/px-arguments/ for more options
@@ -98,6 +98,22 @@ app.layout = dbc.Container([
     html.P(children = 'Gráfico 13: Custeio e fontes de recursos por estados'),
     
     html.P(children = 'Gráfico 14: Investimento e fontes de recursos'),
+    
+    html.P(children = 'Gráfico 15: Custeio e produtos para região e ano'),
+    
+    html.P(children = 'Gráfico 16: Investimento e produtos para região e ano'),
+    
+    html.P(children = 'Gráfico 17: Custeio e produtos para UF e ano'),
+    
+    html.P(children = 'Gráfico 18: Investimento e produtos para UF e ano'),
+    
+    html.H5(children = 'Gráficos para o extrativismo:'),
+    
+    html.P(children = 'Gráfico 19: Para os estados e por produto'),
+    
+    html.P(children = 'Gráfico 20: Por produto e por programa'),
+    
+    html.P(children = 'Gráfico 21: Por produto e por fonte de financiamento'),
     
     html.H5(children = 'Lista de produtos:'),
     
@@ -318,7 +334,88 @@ app.layout = dbc.Container([
                  style = m1),
 
     dcc.Graph(id = 'grafico-14',
-              )
+              ),
+    
+    html.H5(children = 'Gráfico 15'),
+    
+    dcc.Dropdown(id = 'anos-grafico-15',
+                 options = list(range(2013,2024)),
+                 value = 2023,
+                 style = m1),
+    
+    dcc.Dropdown(id = 'regioes-grafico-15',
+                 options = [i.title() for i in custeio_sem_extrativismo['nomeRegiao'].unique()],
+                 value = 'Norte',
+                 style = m1),
+    
+    dcc.Graph(id = 'grafico-15'),
+    
+    html.H5(children = 'Gráfico 16'),
+    
+    dcc.Dropdown(id = 'anos-grafico-16',
+                 options = list(range(2013,2024)),
+                 value = 2023,
+                 style = m1),
+    
+    dcc.Dropdown(id = 'regioes-grafico-16',
+                 options = [i.title() for i in custeio_sem_extrativismo['nomeRegiao'].unique()],
+                 value = 'Norte',
+                 style = m1),
+    
+    dcc.Graph(id = 'grafico-16'),
+    
+    html.H5(children = 'Gráfico 17'),
+    
+    dcc.Dropdown(id = 'anos-grafico-17',
+                 options = list(range(2013,2024)),
+                 value = 2023,
+                 style = m1),
+    
+    dcc.Dropdown(id = 'estados-grafico-17',
+                 options = list(custeio_sem_extrativismo['nomeUF'].unique()),
+                 value = 'PA',
+                 style = m1),
+    
+    dcc.Graph(id = 'grafico-17'),
+    
+    html.H5(children = 'Gráfico 18'),
+    
+    dcc.Dropdown(id = 'anos-grafico-18',
+                 options = list(range(2013,2024)),
+                 value = 2023,
+                 style = m1),
+    
+    dcc.Dropdown(id = 'estados-grafico-18',
+                 options = list(custeio_sem_extrativismo['nomeUF'].unique()),
+                 value = 'PA',
+                 style = m1),
+    
+    dcc.Graph(id = 'grafico-18'),
+    
+    html.H5(children = 'Gráfico 19'),
+    
+    dcc.Dropdown(id = 'anos-grafico-19',
+                 options = list(range(2013,2024)),
+                 value = 2022),
+    
+    dcc.Graph(id = 'grafico-19'),
+    
+    html.H5(children = 'Gráfico 20'),
+    
+    dcc.Dropdown(id = 'anos-grafico-20',
+                 options = list(range(2013,2024)), 
+                 value = 2023),
+    
+    dcc.Graph(id = 'grafico-20'),
+    
+    html.H5(children = 'Gráfico 21'),
+    
+    dcc.Dropdown(id = 'anos-grafico-21',
+                  options = list(range(2013,2024)),
+                  value = 2023),
+    
+    dcc.Graph(id = 'grafico-21')
+
 
 
 
@@ -687,6 +784,192 @@ def grafico_14(ano,prod):
 
     return fig
 
+# Gráfico 15
+
+@app.callback(
+    Output('grafico-15','figure'),
+    Input('anos-grafico-15','value'),
+    Input('regioes-grafico-15','value')
+)
+
+
+def grafico_15(ano, regiao):
+        
+    a = custeio_sem_extrativismo[custeio_sem_extrativismo['AnoEmissao'] == ano]
+
+    a['nomeRegiao'] = a['nomeRegiao'].str.title()
+
+    a = a[a['nomeRegiao'] == regiao]
+
+    a = a[a['nomeProduto'].isin([i.title() for i in especies])]
+
+    a = a[['nomeProduto','cdPrograma','VlCusteio']].groupby(['nomeProduto','cdPrograma'], as_index = False).sum()
+
+    a = a.pivot(index = 'nomeProduto', columns = 'cdPrograma', values = 'VlCusteio').reset_index()
+
+    fig = px.bar(a, 
+                 x = 'nomeProduto',
+                 y = list(a.columns),
+                 title = f'Contratos de custeio na região {regiao} em {ano}',
+                 labels = {'value':'Valor em R$','variable':'Programa','nomeProduto':''})
+    
+    return fig 
+
+# Gráfico 16 
+
+@app.callback(
+    Output('grafico-16','figure'),
+    Input('anos-grafico-16','value'),
+    Input('regioes-grafico-16','value')
+)
+
+def grafico_16(ano,regiao): 
+    
+
+    a = investimento_lavoura_permanente[investimento_lavoura_permanente['AnoEmissao'] == ano]
+
+    a['nomeRegiao'] = a['nomeRegiao'].str.title()
+
+    a = a[a['nomeRegiao'] == regiao]
+
+    a = a[a['nomeProduto'].isin([i.title() for i in especies])]
+
+    a = a[['nomeProduto','cdPrograma','VlCusteio']].groupby(['nomeProduto','cdPrograma'], as_index = False).sum()
+
+    a = a.pivot(index = 'nomeProduto', columns = 'cdPrograma', values = 'VlCusteio').reset_index()
+
+    fig = px.bar(a, 
+                 x = 'nomeProduto',
+                 y = list(a.columns),
+                 title = f'Contratos de investimento na região {regiao} em {ano}',
+                 labels = {'value':'Valor em R$','variable':'Programa','nomeProduto':''})
+    
+    return fig
+
+# Gráfico 17 
+
+@app.callback(
+    Output('grafico-17','figure'),
+    Input('anos-grafico-17','value'),
+    Input('estados-grafico-17','value')
+)
+
+def grafico_17(ano,UF): 
+        
+    a = custeio_sem_extrativismo[custeio_sem_extrativismo['AnoEmissao'] == ano]
+
+    a = a[a['nomeUF'] == UF]
+
+    a = a[a['nomeProduto'].isin([i.title() for i in especies])]
+
+    a = a[['nomeProduto','cdPrograma','VlCusteio']].groupby(['nomeProduto','cdPrograma'], as_index = False).sum()
+
+    a = a.pivot(index = 'nomeProduto', columns = 'cdPrograma', values = 'VlCusteio').reset_index()
+
+    fig = px.bar(a, 
+                 x = 'nomeProduto',
+                 y = list(a.columns),
+                 title = f'Contratos de custeio em {ano}',
+                 labels = {'value':'Valor em R$','variable':'Programa','nomeProduto':''})
+    
+    return fig 
+
+# Gráfico 18 
+
+@app.callback(
+    Output('grafico-18','figure'),
+    Input('anos-grafico-18','value'),
+    Input('estados-grafico-18','value')
+)
+
+def grafico_18(ano,UF): 
+        
+    a = investimento_lavoura_permanente[investimento_lavoura_permanente['AnoEmissao'] == ano]
+
+    a = a[a['nomeUF'] == UF]
+
+    a = a[a['nomeProduto'].isin([i.title() for i in especies])]
+
+    a = a[['nomeProduto','cdPrograma','VlCusteio']].groupby(['nomeProduto','cdPrograma'], as_index = False).sum()
+
+    a = a.pivot(index = 'nomeProduto', columns = 'cdPrograma', values = 'VlCusteio').reset_index()
+
+    fig = px.bar(a, 
+                 x = 'nomeProduto',
+                 y = list(a.columns),
+                 title = f'Contratos de investimento em {ano}',
+                 labels = {'value':'Valor em R$','variable':'Programa','nomeProduto':''})
+    
+    return fig 
+
+# Gráfico 19 
+
+@app.callback(
+    Output('grafico-19','figure'),
+    Input('anos-grafico-19','value')
+)
+
+def grafico_19(ano): 
+       
+    a = custeio_para_extrativismo[custeio_para_extrativismo['AnoEmissao'] == ano]
+
+    a = a[['nomeProduto','nomeUF','VlCusteio']].groupby(['nomeProduto','nomeUF'], as_index = False).sum()
+
+    a = a.pivot(index = 'nomeUF', columns = 'nomeProduto', values = 'VlCusteio').reset_index()
+
+    fig = px.bar(a, 
+                 x = 'nomeUF', 
+                 y = list(a.columns),
+                 title = f'Extrativismo em {ano} por estado',
+                 labels = {'nomeUF':'','value':'Valores em R$','variable':'Produto'})
+    
+    return fig 
+
+# Gráfico 20 
+
+@app.callback(
+    Output('grafico-20','figure'),
+    Input('anos-grafico-20','value')
+)
+
+def grafico_20(ano): 
+    
+    a = custeio_para_extrativismo[custeio_para_extrativismo['AnoEmissao'] == ano]
+
+    a = a[['nomeProduto','cdPrograma','VlCusteio']].groupby(['nomeProduto','cdPrograma'], as_index = False).sum()
+
+    a = a.pivot(index = 'nomeProduto', columns = 'cdPrograma', values = 'VlCusteio').reset_index()
+
+    fig = px.bar(a, 
+             x = 'nomeProduto', 
+             y = list(a.columns),
+             title = f'Extrativismo em {ano} por programa',
+             labels = {'nomeUF':'','value':'Valores em R$','variable':'Produto','nomeProduto':''})
+    
+    return fig 
+
+# Gráfico 21 
+
+@app.callback(
+    Output('grafico-21','figure'),
+    Input('anos-grafico-21','value')
+)
+
+def grafico_21(ano): 
+    
+    a = custeio_para_extrativismo[custeio_para_extrativismo['AnoEmissao'] == ano]
+
+    a = a[['nomeProduto','cdFonteRecurso','VlCusteio']].groupby(['nomeProduto','cdFonteRecurso'], as_index = False).sum()
+
+    a = a.pivot(index = 'nomeProduto', columns = 'cdFonteRecurso', values = 'VlCusteio').reset_index()
+
+    fig = px.bar(a, 
+                 x = 'nomeProduto', 
+                 y = list(a.columns),
+                 title = f'Extrativismo em {ano} por fonte de recurso',
+                 labels = {'nomeUF':'','value':'Valores em R$','variable':'Produto','nomeProduto':''})
+    
+    return fig 
 
 
 
@@ -694,6 +977,8 @@ def grafico_14(ano,prod):
 if __name__ == '__main__':
     app.run(debug=False,
            port = 8020)
+
+
 
 
 
